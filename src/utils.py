@@ -4,8 +4,9 @@ import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+import torch.nn as nn
 from train import meta_test_step
-from torch import nn
+
 
 def plot_training_history(history, dataset_name):
     """Plot training curves"""
@@ -70,14 +71,14 @@ def analyze_mistakes(predictions, labels, class_names=None):
     return cm, class_acc
 
 
-def ensemble_predictions(models, data, task, config, device):
+def ensemble_predictions(models, dataset_name, data, task, config, device):
     """Ensemble multiple models for better accuracy"""
     all_predictions = []
     all_confidences = []
     
     for model in models:
         _, _, predictions, _, confidence = meta_test_step(
-            model, 'Cora', data, task, config, device
+            model, dataset_name, data, task, config, device
         )
         all_predictions.append(predictions)
         all_confidences.append(confidence)
@@ -96,6 +97,9 @@ def ensemble_predictions(models, data, task, config, device):
         final_predictions.append(np.argmax(votes))
     
     return final_predictions
+
+
+# Additional improvements for maximum accuracy:
 
 # 1. Data Augmentation for Graphs
 def augment_graph(x, edge_index, aug_ratio=0.1):
